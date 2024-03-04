@@ -19,7 +19,7 @@ def library_management_list(request):
         library = library_management.objects.all()
         serializer = library_managementSerializer(library, many=True)
         if serializer.is_valid:
-            serializer.save
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors , status=status.HTTP_400_BAD_REQUEST)
 
@@ -37,4 +37,13 @@ def library_management_detail(request, pk):
         return Response(serializer)
     
     elif request.method == "PUT":
+        serializer = library_managementSerializer(library_management, request=request.data)
+        if serializer.is_valid:
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == "DELETE":
+        instance.delete
+        return Response(status=status.HTTP_204_NO_CONTENT)
         
