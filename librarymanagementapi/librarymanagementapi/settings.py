@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'librarymanagement',
+    'simplejwt',
 ]
 
 MIDDLEWARE = [
@@ -84,6 +85,16 @@ DATABASES = {
         'HOST': 'localhost',
         'PORT': '3306',
     }
+}
+
+
+# Token authentication
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+
 }
 
 
