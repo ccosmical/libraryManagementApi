@@ -4,6 +4,7 @@ from .serializer import library_managementSerializer
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
 from permissions import isAuthenticatedOrReadOnly
 
 
@@ -13,9 +14,13 @@ from permissions import isAuthenticatedOrReadOnly
 @permission_classes([isAuthenticatedOrReadOnly])
 def library_management_list(request):
     if request.method == 'GET':
+        paginator=PageNumberPagination()
+        paginator.page_size=10
+
         library = library_management.objects.all()
-        serializer = library_managementSerializer(library, many=True)
-        return Response(serializer.data)
+        result_page = paginator.paginate_queryset(library, request)
+        serializer = library_managementSerializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
     elif request.method == 'POST':
         library = library_management.objects.all()
@@ -36,8 +41,12 @@ def library_management_detail(request, pk):
     
 
     if request.method == "GET":
-        serializer = library_managementSerializer(instance)
-        return Response(serializer)
+        paginator = PageNumberPagination()
+        paginator.page_size=10
+
+        result_page = paginator.paginate_queryset(instance, request)
+        serializer = library_managementSerializer(result_page)
+        return paginator.get_paginated_response(serializer)
     
     elif request.method == "PUT":
         serializer = library_managementSerializer(library_management, request=request.data)
