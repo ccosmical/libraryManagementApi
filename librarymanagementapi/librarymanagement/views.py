@@ -2,13 +2,15 @@ from django.shortcuts import render
 from .models import library_management
 from .serializer import library_managementSerializer
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+from permissions import isAuthenticatedOrReadOnly
 
 
 # Create your views here.
 
 @api_view(['GET', 'POST'])
+@permission_classes([isAuthenticatedOrReadOnly])
 def library_management_list(request):
     if request.method == 'GET':
         library = library_management.objects.all()
@@ -25,6 +27,7 @@ def library_management_list(request):
 
 
 @api_view(['GET','PUT','DELETE'])
+@permission_classes([isAuthenticatedOrReadOnly])
 def library_management_detail(request, pk):
     try:
         instance = library_management.objects.get(pk=pk)
