@@ -2,6 +2,7 @@ from django.shortcuts import render
 from .models import library_management
 from .serializer import library_managementSerializer
 from rest_framework import status
+from rest_framework.filters import SearchFilter
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
@@ -14,10 +15,16 @@ from permissions import isAuthenticatedOrReadOnly
 @permission_classes([isAuthenticatedOrReadOnly])
 def library_management_list(request):
     if request.method == 'GET':
+        #creating pagination object and settings
         paginator=PageNumberPagination()
         paginator.page_size=10
 
+        #creating filter object and setting search fields
+        search_fields= ['title','author','publication_date','category']
+        filter_backend = SearchFilter(search_fields=search_fields)
+        
         library = library_management.objects.all()
+        
         result_page = paginator.paginate_queryset(library, request)
         serializer = library_managementSerializer(result_page, many=True)
         return paginator.get_paginated_response(serializer.data)
@@ -43,6 +50,9 @@ def library_management_detail(request, pk):
     if request.method == "GET":
         paginator = PageNumberPagination()
         paginator.page_size=10
+
+        search_fields=['title','author','publication_date','category']
+        filter_backend= SearchFilter(search_fields)
 
         result_page = paginator.paginate_queryset(instance, request)
         serializer = library_managementSerializer(result_page)
