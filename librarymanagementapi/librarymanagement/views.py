@@ -15,17 +15,20 @@ from permissions import isAuthenticatedOrReadOnly
 @permission_classes([isAuthenticatedOrReadOnly])
 def library_management_list(request):
     if request.method == 'GET':
-        #creating pagination object and settings
-        paginator=PageNumberPagination()
-        paginator.page_size=10
+        
+        library = library_management.objects.all()
 
         #creating filter object and setting search fields
         search_fields= ['title','author','publication_date','category']
         filter_backend = SearchFilter(search_fields=search_fields)
+        library= filter_backend.filter_queryset(request, library)
         
-        library = library_management.objects.all()
         
+        #creating pagination object and settings
+        paginator=PageNumberPagination()
+        paginator.page_size=10
         result_page = paginator.paginate_queryset(library, request)
+
         serializer = library_managementSerializer(result_page, many=True)
         return paginator.get_paginated_response(serializer.data)
 
@@ -48,15 +51,17 @@ def library_management_detail(request, pk):
     
 
     if request.method == "GET":
-        paginator = PageNumberPagination()
-        paginator.page_size=10
-
+        
         search_fields=['title','author','publication_date','category']
         filter_backend= SearchFilter(search_fields)
-
+        instance= filter_backend.filter_queryset(request, instance)
+        
+        paginator = PageNumberPagination()
+        paginator.page_size=10
         result_page = paginator.paginate_queryset(instance, request)
+
         serializer = library_managementSerializer(result_page)
-        return paginator.get_paginated_response(serializer)
+        return paginator.get_paginated_response(serializer.data)
     
     elif request.method == "PUT":
         serializer = library_managementSerializer(library_management, request=request.data)
